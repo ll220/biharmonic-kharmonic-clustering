@@ -1,3 +1,7 @@
+import random
+random.seed(246)        # or any integer
+import numpy
+numpy.random.seed(4812)
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -6,6 +10,7 @@ probs = [[0.25, 0.05, 0.02], [0.05, 0.35, 0.07], [0.02, 0.07, 0.40]]
 g = nx.stochastic_block_model(sizes, probs, seed=0)
 print(len(g))
 
+
 # H = nx.quotient_graph(g, g.graph["partition"], relabel=True)
-nx.draw(g, with_labels = True)
-plt.savefig("filename.png")
+# nx.draw(g, with_labels = True)
+# plt.savefig("filename.png")
