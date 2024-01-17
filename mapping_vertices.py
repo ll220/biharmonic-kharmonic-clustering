@@ -137,7 +137,10 @@ def get_triangle_lengths(cluster_centers):
 def plot_triangle(sorted_triangle_lengths, output_file_name, variances=None):
 
     # use law of cosines
-    B = np.arccos((sorted_triangle_lengths[0][0]**2 + sorted_triangle_lengths[2][0]**2 - sorted_triangle_lengths[1][0]**2) / (2 * sorted_triangle_lengths[0][0] * sorted_triangle_lengths[2][0]))
+    try:
+        B = np.arccos((sorted_triangle_lengths[0][0]**2 + sorted_triangle_lengths[2][0]**2 - sorted_triangle_lengths[1][0]**2) / (2 * sorted_triangle_lengths[0][0] * sorted_triangle_lengths[2][0]))
+    except:
+        return
     
     P0 = (0, 0)
     P1 = (sorted_triangle_lengths[0][0], 0)
@@ -173,7 +176,7 @@ def plot_triangle(sorted_triangle_lengths, output_file_name, variances=None):
     # plt.show()
     plt.clf()
 
-def plot_k_vs_accuracy(k_harmonics, mean_accuracies, max_accuracies, mean_output_file_name, max_output_file_name):
+def plot_k_vs_random_score_accuracy(k_harmonics, mean_accuracies, max_accuracies, mean_output_file_name, max_output_file_name):
     plt.plot(k_harmonics, mean_accuracies)
     plt.title("k vs mean adjusted random score over 10 trials")
     plt.savefig(mean_output_file_name)
@@ -182,6 +185,18 @@ def plot_k_vs_accuracy(k_harmonics, mean_accuracies, max_accuracies, mean_output
 
     plt.plot(k_harmonics, max_accuracies)
     plt.title("k vs max adjusted random score over 10 trials")
+    plt.savefig(max_output_file_name)
+    plt.clf()
+
+def plot_k_vs_purity_accuracy(k_harmonics, mean_accuracies, max_accuracies, mean_output_file_name, max_output_file_name):
+    plt.plot(k_harmonics, mean_accuracies)
+    plt.title("k vs mean purity over 10 trials")
+    plt.savefig(mean_output_file_name)
+    # plt.show()
+    plt.clf()
+
+    plt.plot(k_harmonics, max_accuracies)
+    plt.title("k vs max purity over 10 trials")
     plt.savefig(max_output_file_name)
     plt.clf()
 
@@ -211,12 +226,13 @@ def analysis():
     # G.add_nodes_from(sorted(unordered_g.nodes(data=True)))
     # G.add_edges_from(unordered_g.edges(data=True))
 
+    f = open("125_nn_results.txt", "w")
 
     data = load_iris()
     true_clusters = data.target
     points = np.array(data.data)
 
-    adjacency_matrix = kneighbors_graph(points, 50, mode='connectivity', include_self=False)
+    adjacency_matrix = kneighbors_graph(points, 125, mode='connectivity', include_self=False)
     G = nx.from_numpy_array(adjacency_matrix)
 
     # nodes = list(G.nodes)
@@ -227,13 +243,20 @@ def analysis():
         quit()
 
     # true_clusters = get_expected_clustering(nodes)
-    mean_accuracies = []
-    max_accuracies = []
+    mean_rand_score_accuracies = []
+    max_rand_score_accuracies = []
+    mean_purities = []
+    max_purities = []
 
     for k in K_HARMONICS:
-        print("k: ", k)
-        accuracy_trials = []
-        max_accuracy = -2
+        f.write("k: ")
+        f.write(str(k))
+        f.write("\n")
+
+        rand_score_accuracy_trials = []
+        purity_trials = []
+        max_rand_score_accuracy = -2
+        max_purity = -2
         best_triangle = best_normalized_triangle = best_labels = best_centers = best_means = None
 
         position_encoding = get_position_encoding(k, G)
@@ -250,24 +273,37 @@ def analysis():
 
         for _ in range(10):
             kmeans = return_clustering(G, position_encoding, NUM_CLUSTERS, output_png=file_name)
-            accuracy = adjusted_rand_score(true_clusters, kmeans.labels_)
+            purity = get_purity(kmeans.labels_, true_clusters)
+            rand_score_accuracy = adjusted_rand_score(true_clusters, kmeans.labels_)
             triangle, normalized_triangle = get_triangle_lengths(kmeans.cluster_centers_)
 
-            accuracy_trials.append(accuracy)
+            rand_score_accuracy_trials.append(rand_score_accuracy)
+            purity_trials.append(purity)
 
-            if (accuracy > max_accuracy):
+            if (purity > max_purity):
                 best_kmeans = kmeans
-                max_accuracy =  accuracy 
+                max_rand_score_accuracy =  rand_score_accuracy 
+                max_purity = purity
                 best_labels = kmeans.labels_
                 best_centers = kmeans.cluster_centers_
                 best_triangle = triangle
                 best_normalized_triangle = normalized_triangle
 
-        mean_accuracy = np.mean(accuracy_trials)
-        max_accuracy = np.max(accuracy_trials)
-        print("Mean accuracy: ", mean_accuracy)
-        mean_accuracies.append(mean_accuracy)
-        max_accuracies.append(max_accuracy)
+        mean_rand_score_accuracy = np.mean(rand_score_accuracy_trials)
+        max_rand_score_accuracy = np.max(rand_score_accuracy_trials)
+        # print("Mean accuracy: ", mean_rand_score_accuracy)
+
+        mean_purity = np.mean(purity_trials)
+        max_purity = np.max(purity_trials)
+        f.write("Mean purity: ")
+        f.write(str(mean_purity))
+        f.write("\n")
+
+        mean_rand_score_accuracies.append(mean_rand_score_accuracy)
+        max_rand_score_accuracies.append(max_rand_score_accuracy)
+
+        mean_purities.append(mean_purity)
+        max_purities.append(max_purity)
 
         colors = ['red', 'blue', 'green']
         node_colors = [colors[cluster] for cluster in best_kmeans.labels_]
@@ -278,10 +314,10 @@ def analysis():
         # plt.show()    
         plt.clf()
 
-        max_accuracy_index = accuracy_trials.index(max(accuracy_trials))
+        max_accuracy_index = purity_trials.index(max(purity_trials))
         mean_distances, max_distances = calculate_variance(best_labels, best_centers, position_encoding)
 
-        if (accuracy_trials[max_accuracy_index] == 1):
+        if (purity_trials[max_accuracy_index] == 1):
             mean_distances_file_name = file_name + "_mean_dist_(total_accuracy).png"
             normalized_triangle_name = file_name + "_sample_normalized_triangle_(total_accuracy).png"
             max_distances_file_name = file_name + "_max_dist_(total_accuracy).png"
@@ -302,9 +338,11 @@ def analysis():
         plot_triangle(best_triangle, mean_distances_file_name, variances=mean_distances)
         plot_triangle(best_triangle, max_distances_file_name, variances=max_distances)
 
-    mean_k_vs_accuracy_filename = "k_vs_mean_accuracy.png"
-    max_k_vs_accuracy_filename = "k_vs_max_accuracy"
-    plot_k_vs_accuracy(K_HARMONICS, mean_accuracies, max_accuracies, mean_k_vs_accuracy_filename, max_k_vs_accuracy_filename)
+
+    plot_k_vs_random_score_accuracy(K_HARMONICS, mean_rand_score_accuracies, max_rand_score_accuracies, "k_vs_mean_adjusted_rand_score.png", "k_vs_max_adjusted_rand_score.png")
+    plot_k_vs_purity_accuracy(K_HARMONICS, mean_purities, max_purities, "k_vs_mean_purities.png", "k_vs_max_purities.png")
+
+    f.close()
 
 def main():   
     # input_directory = sys.argv[1]
