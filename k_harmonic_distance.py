@@ -1,7 +1,6 @@
-
 import networkx as nx
 import numpy as np
-import scipy
+from scipy.linalg import fractional_matrix_power
 from typing import List, Tuple
 
 def component_mask(graph : nx.Graph) -> np.array:
@@ -21,7 +20,7 @@ def max_k_harmonic_distance(graph : nx.Graph, k : int) -> Tuple[int,int]:
     """ Return the edge with the highest k-harmonic distance """
     laplacian = nx.laplacian_matrix(graph).todense()
     pinv = np.linalg.pinv(laplacian, hermitian=True)
-    k_pinv = scipy.linalg.fractional_matrix_power(pinv, float(k))
+    k_pinv = fractional_matrix_power(pinv, float(k))
     k_harmonic_distance = lambda s, t : k_pinv[s,s] + k_pinv[t,t] - 2*k_pinv[s,t]
     edges = list(graph.edges)
     k_harmonic_of_edges = [k_harmonic_distance(u,v) for u,v in edges]
@@ -62,7 +61,7 @@ def k_harmonics_of_edges(graph : nx.Graph, k : int) -> Tuple[int,int]:
     """ Return the edge with the highest biharmonic distance """
     laplacian = nx.laplacian_matrix(graph).todense()
     pinv = np.linalg.pinv(laplacian, hermitian=True)
-    k_pinv = scipy.linalg.fractional_matrix_power(pinv, float(k))
+    k_pinv = fractional_matrix_power(pinv, float(k))
     k_harmonic_distance = lambda s, t : k_pinv[s,s] + k_pinv[t,t] - 2*k_pinv[s,t]
     k_harmonic_of_edges = [k_harmonic_distance(u,v) for u,v in graph.edges]
     return k_harmonic_of_edges

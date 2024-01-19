@@ -1,6 +1,6 @@
 import numpy as np
 import networkx as nx
-import scipy
+from scipy.linalg import fractional_matrix_power
 from sklearn.cluster import KMeans
 
 def get_k_harmonic_position_encoding(
@@ -12,7 +12,7 @@ def get_k_harmonic_position_encoding(
     laplacian = laplacian.toarray()
 
     laplacian_inverse = np.linalg.pinv(laplacian, hermitian=True)
-    position_encoding = scipy.linalg.fractional_matrix_power(laplacian_inverse, float(k / 2))
+    position_encoding = fractional_matrix_power(laplacian_inverse, float(k / 2))
     position_encoding = position_encoding.real
     position_encoding = position_encoding.transpose()
     return position_encoding
