@@ -3,10 +3,9 @@ import numpy as np
 def get_purity(
     clustering_results : np.array,
     true_labels : np.array,
-    num_clusters : int
 ) -> float:
     num_correct = 0
-    for cluster in range(num_clusters):
+    for cluster in np.unique(clustering_results):
         ground_truth = true_labels[clustering_results == cluster]
         majority_label = np.bincount(ground_truth).argmax()
         num_correct += np.count_nonzero(ground_truth == majority_label)
