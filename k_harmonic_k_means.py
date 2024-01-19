@@ -25,6 +25,16 @@ def k_harmonic_k_means(
     """ Compute the k-harmonic k-means clustering of a graph G """
     position_encoding = get_k_harmonic_position_encoding(G, k)
     kmeans = KMeans(n_clusters=num_clusters, random_state=0, n_init="auto").fit(position_encoding)
+    return kmeans
+
+def k_harmonic_k_means_labels(
+    G : nx.Graph,
+    k : int,
+    num_clusters : int
+) -> np.array:
+    """ Compute the k-harmonic k-means clustering of a graph G """
+    position_encoding = get_k_harmonic_position_encoding(G, k)
+    kmeans = KMeans(n_clusters=num_clusters, random_state=0, n_init="auto").fit(position_encoding)
     return kmeans.labels_
 
 if __name__=="__main__":
@@ -34,5 +44,5 @@ if __name__=="__main__":
     num_clusters = 3
     harmonic_k = 5
     graph, true_labels = load_iris_graph_and_labels(num_neighbors=125)
-    pred_labels = k_harmonic_k_means(graph, harmonic_k, num_clusters)
+    pred_labels = k_harmonic_k_means_labels(graph, harmonic_k, num_clusters)
     print(get_purity(pred_labels, true_labels, num_clusters))
