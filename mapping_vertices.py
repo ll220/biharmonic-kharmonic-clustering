@@ -4,13 +4,17 @@ import numpy as np
 # np.random.seed(4812)
 import networkx as nx
 import matplotlib.pyplot as plt
+import pandas as pd
 import scipy
 from sklearn.cluster import KMeans
 from sklearn.metrics import adjusted_rand_score
 import sys
+from typing import Optional
 import os
-from sklearn.datasets import load_iris
-from sklearn.neighbors import kneighbors_graph
+
+from k_harmonic_k_means import get_k_harmonic_position_encoding, k_harmonic_k_means, k_harmonic_k_means_labels
+from k_harmonic_girvan_newman import k_harmonic_girvan_newman_labels, k_harmonic_girvan_newman_best_labels
+from generate_graphs import load_iris_graph_and_labels
 
 
 # CANNOT BE CHANGED WITHOUT CHANGING CODE
@@ -103,21 +107,6 @@ def get_expected_clustering(nodes):
 
     return np.array(expected_labels)
 
-def get_position_encoding(k, G):
-    laplacian = nx.laplacian_matrix(G)
-    laplacian = laplacian.toarray()
-
-    laplacian_inverse = np.linalg.pinv(laplacian)
-    position_encoding = scipy.linalg.fractional_matrix_power(laplacian_inverse, float(k / 2))
-    position_encoding = position_encoding.real
-    position_encoding = position_encoding.transpose()
-    return position_encoding
-
-def return_clustering(G, position_encoding, num_clusters, output_png=None):
-    kmeans = KMeans(n_clusters=num_clusters, random_state=0, n_init="auto").fit(position_encoding)
-
-    return kmeans
-
 def get_triangle_lengths(cluster_centers):
     lengths = []
 
@@ -202,17 +191,16 @@ def plot_k_vs_purity_accuracy(k_harmonics, mean_accuracies, max_accuracies, mean
 
 def get_purity(clustering_results, true_labels):
     num_correct = 0
-    for cluster in range(NUM_CLUSTERS):
+    for cluster in np.unique(clustering_results):
         ground_truth = true_labels[clustering_results == cluster]
         majority_label = np.bincount(ground_truth).argmax()
         num_correct += np.count_nonzero(ground_truth == majority_label)
-
     purity = num_correct / clustering_results.shape[0]
     return purity
 
 
 # def analysis(input_file, output_directory):
-def analysis():
+def k_means_analysis():
     # print("Now analyzing: ", input_file)
     # # assumption that all vertices are encoded as 0-n consecutive integers
     # f = open(input_file, "r")
@@ -228,13 +216,7 @@ def analysis():
 
     f = open("125_nn_results.txt", "w")
 
-    data = load_iris()
-    true_clusters = data.target
-    points = np.array(data.data)
-
-    adjacency_matrix = kneighbors_graph(points, 125, mode='connectivity', include_self=False)
-    G = nx.from_numpy_array(adjacency_matrix)
-
+    G, true_clusters = load_iris_graph_and_labels(num_neighbors=125)
     # nodes = list(G.nodes)
     # print(nodes)
 
@@ -259,7 +241,7 @@ def analysis():
         max_purity = -2
         best_triangle = best_normalized_triangle = best_labels = best_centers = best_means = None
 
-        position_encoding = get_position_encoding(k, G)
+        position_encoding = get_k_harmonic_position_encoding(k, G)
         expected_centroids = get_ideal_centroids(position_encoding, true_clusters)
         expected_triangle, expected_normal_triangle = get_triangle_lengths(expected_centroids)
         expected_mean_distances, expected_max_distances = calculate_variance(true_clusters, expected_centroids, position_encoding)
@@ -272,7 +254,7 @@ def analysis():
             file_name = str(k)
 
         for _ in range(10):
-            kmeans = return_clustering(G, position_encoding, NUM_CLUSTERS, output_png=file_name)
+            kmeans = k_harmonic_k_means(G, position_encoding, NUM_CLUSTERS, output_png=file_name)
             purity = get_purity(kmeans.labels_, true_clusters)
             rand_score_accuracy = adjusted_rand_score(true_clusters, kmeans.labels_)
             triangle, normalized_triangle = get_triangle_lengths(kmeans.cluster_centers_)
@@ -344,6 +326,40 @@ def analysis():
 
     f.close()
 
+def k_hyperparameter_analysis(
+    graph_and_label_func,
+    graph_func_kwargs,
+    clustering_algorithm,
+    clustering_func_kwargs,
+    dataset_name : Optional[str] = None,
+    clustering_alg_name : Optional[str] = None
+):
+    """ Use `clustering_algorithm` to cluster the graph given by `graph_and_label_func` for various k """
+    if dataset_name is None:
+        dataset_name = graph_and_label_func.__name__
+    if clustering_alg_name is None:
+        clustering_alg_name = clustering_algorithm.__name__
+
+    graph, true_labels = graph_and_label_func(**graph_func_kwargs)
+
+    results = []
+    for k in K_HARMONICS:
+        clustering_func_kwargs["k"] = k
+        pred_labels = clustering_algorithm(graph, **clustering_func_kwargs)
+        purity = get_purity(pred_labels, true_labels)
+        results.append({
+            "dataset" : dataset_name,
+            "algorithm" : clustering_alg_name,
+            "purity" : purity
+        } | graph_func_kwargs | clustering_func_kwargs)
+    
+    results_df = pd.DataFrame(results)
+    with open(f"results/{dataset_name}_{clustering_alg_name}.csv", "a") as f:
+        file_exists = f.tell()
+        results_df.to_csv(f, mode="a", header=(not file_exists))
+
+
+
 def main():   
     # input_directory = sys.argv[1]
     # output_directory = sys.argv[2]
@@ -352,8 +368,22 @@ def main():
 
     # for input_file in input_files:
     #     analysis(os.path.join(input_directory, input_file), output_directory)
+    for num_neighbors in [25, 50, 75, 100]:
+        graph_func_kwargs = {"num_neighbors" : num_neighbors}
+        clustering_func_kwargs = {"num_clusters" : 10}
+        funcs = [k_harmonic_k_means_labels, k_harmonic_girvan_newman_labels]
+        func_names = ["k-Means", "Girvan-Newman"]
+        for func, func_name in zip(funcs, func_names):
+            print(f"{func_name} {num_neighbors}")
+            k_hyperparameter_analysis(
+                load_iris_graph_and_labels,
+                graph_func_kwargs,
+                func,
+                clustering_func_kwargs,
+                dataset_name="iris",
+                clustering_alg_name=func_name
+            )
 
-    analysis()
 
 if __name__ == "__main__":
     main()
