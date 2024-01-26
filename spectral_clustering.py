@@ -1,5 +1,3 @@
-from generate_graphs import load_iris_graph_and_labels
-from mapping_vertices import get_purity
 import networkx as nx
 import numpy as np
 from sklearn.cluster import KMeans
@@ -42,6 +40,9 @@ def run_spectral_clustering(
     return kmeans.labels_
 
 if __name__=="__main__":
+    from generate_graphs import load_iris_graph_and_labels
+    from mapping_vertices import get_purity
+
     K_HARMONICS = [0.1, 0.5, 1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 50, 100]
 
     # for k_neighbors in [25, 50, 75, 100, 125]:
