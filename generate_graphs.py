@@ -26,6 +26,18 @@ def load_cancer_graph_and_labels(num_neighbors : int) -> nx.Graph:
     graph = nx.from_numpy_array(adjacency_matrix)
     return graph, labels
 
+def load_uci_graph_and_labels(
+    num_neighbors : int, 
+    id : int
+):
+    from ucimlrepo import fetch_ucirepo 
+    dataset = fetch_ucirepo(id=id)
+    X = dataset.data.features.to_numpy()
+    y = dataset.data.targets.to_numpy()[:,0]
+    adjacency_matrix = kneighbors_graph(X, num_neighbors, mode='connectivity', include_self=False)
+    graph = nx.from_numpy_array(adjacency_matrix)
+    return graph, y
+
 def load_block_stochastic_graph_and_labels(
     num_nodes_per_cluster : int,
     num_clusters : int,
@@ -57,6 +69,7 @@ def load_block_stochastic_graph_and_labels(
 
 
 if __name__=="__main__":
+    """
     graph, labels = load_cancer_graph_and_labels(num_neighbors=25)
     colors = ['red', 'blue', 'green']
     node_colors = [colors[cluster] for cluster in labels]
@@ -64,6 +77,8 @@ if __name__=="__main__":
     plt.title('Iris Generated Graph k=125')
     # plt.savefig('Iris Generated Graph k=125')
     plt.show()
+    """
+    graph, labels = load_uci_graph_and_labels(num_neighbors=10, id=320)
 
 # sizes = [75, 75, 300]
 # # probs = [[0.25, 0.05, 0.02], [0.05, 0.35, 0.07], [0.02, 0.07, 0.40]]
