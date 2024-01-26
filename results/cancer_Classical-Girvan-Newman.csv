@@ -1,0 +1,5 @@
+,dataset,algorithm,purity,num_neighbors,num_clusters
+0,cancer,Classical-Girvan-Newman,0.8189806678383128,10,2
+0,cancer,Classical-Girvan-Newman,0.8242530755711776,25,2
+0,cancer,Classical-Girvan-Newman,0.8857644991212654,50,2
+0,cancer,Classical-Girvan-Newman,0.7469244288224957,75,2
