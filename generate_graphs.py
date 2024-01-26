@@ -26,6 +26,35 @@ def load_cancer_graph_and_labels(num_neighbors : int) -> nx.Graph:
     graph = nx.from_numpy_array(adjacency_matrix)
     return graph, labels
 
+def load_block_stochastic_graph_and_labels(
+    num_nodes_per_cluster : int,
+    num_clusters : int,
+    intercluster_p : float,
+    intracluster_p : float
+) -> nx.Graph:
+    """ return a block stochatsic graph
+    
+    args:
+        num_nodes_per_cluster
+        num_clusters
+        intercluster_p  : probability of edge between nodes in different clusters
+        intracluster_p : probability of edge between nodes in same cluster
+
+    """
+    cluster_sizes = num_clusters * [num_nodes_per_cluster]
+    P = (intracluster_p-intercluster_p)*np.eye(num_clusters) + (intercluster_p)*np.ones((num_clusters, num_clusters))
+    graph = nx.stochastic_block_model(
+        cluster_sizes,
+        P
+    )
+    labels = np.array([
+        i 
+        for i in range(num_clusters)
+        for _ in range(num_nodes_per_cluster)
+    ])
+
+    return graph, labels
+
 
 if __name__=="__main__":
     graph, labels = load_cancer_graph_and_labels(num_neighbors=25)
