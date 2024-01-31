@@ -1,0 +1,6 @@
+,dataset,algorithm,purity,num_neighbors,num_clusters
+0,cancer,Spectral-Clustering,0.6660808435852372,10,2
+0,cancer,Spectral-Clustering,0.6362038664323374,25,2
+0,cancer,Spectral-Clustering,0.8734622144112478,50,2
+0,cancer,Spectral-Clustering,0.8734622144112478,75,2
+0,cancer,Spectral-Clustering,0.8875219683655536,100,2

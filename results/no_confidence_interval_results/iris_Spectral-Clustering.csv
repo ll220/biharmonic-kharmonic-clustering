@@ -1,0 +1,6 @@
+,dataset,algorithm,purity,num_neighbors,num_clusters
+0,iris,Spectral-Clustering,0.6666666666666666,10,3
+0,iris,Spectral-Clustering,0.7533333333333333,25,3
+0,iris,Spectral-Clustering,0.9133333333333333,50,3
+0,iris,Spectral-Clustering,0.5733333333333334,75,3
+0,iris,Spectral-Clustering,0.5266666666666666,100,3
