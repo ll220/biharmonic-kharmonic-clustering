@@ -1,0 +1,6 @@
+,dataset,algorithm,purity,num_neighbors,num_clusters
+0,wine,Spectral-Clustering,0.7247191011235955,10,3
+0,wine,Spectral-Clustering,0.702247191011236,25,3
+0,wine,Spectral-Clustering,0.7415730337078652,50,3
+0,wine,Spectral-Clustering,0.7134831460674157,75,3
+0,wine,Spectral-Clustering,0.6292134831460674,100,3

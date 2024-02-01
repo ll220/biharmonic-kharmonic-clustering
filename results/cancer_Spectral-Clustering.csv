@@ -1,6 +1,6 @@
-,dataset,algorithm,purity,num_neighbors,num_clusters
-0,cancer,Spectral-Clustering,0.6660808435852372,10,2
-0,cancer,Spectral-Clustering,0.6362038664323374,25,2
-0,cancer,Spectral-Clustering,0.8734622144112478,50,2
-0,cancer,Spectral-Clustering,0.8734622144112478,75,2
-0,cancer,Spectral-Clustering,0.8875219683655536,100,2
+dataset,algorithm,mean_purity,num_neighbors,num_clusters,ci
+iris,spectral-clustering,0.7152899824253076,25,2,(0.6387406644349535, 0.7918393004156618)
+iris,spectral-clustering,0.7413005272407733,50,2,(0.6881830148497632, 0.7944180396317835)
+iris,spectral-clustering,0.7019332161687171,75,2,(0.6302161941008623, 0.7736502382365719)
+iris,spectral-clustering,0.7630931458699474,100,2,(0.6856478968425941, 0.8405383948973006)
+iris,spectral-clustering,0.6975395430579965,125,2,(0.6198234385391719, 0.7752556475768211)

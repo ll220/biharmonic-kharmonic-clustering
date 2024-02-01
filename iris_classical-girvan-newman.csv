@@ -1,0 +1,6 @@
+dataset,algorithm,purity,num_neighbors,num_clusters
+iris,classical-girvan-newman,0.9066666666666666,25,3
+iris,classical-girvan-newman,0.8733333333333333,50,3
+iris,classical-girvan-newman,0.6666666666666666,75,3
+iris,classical-girvan-newman,0.3466666666666667,100,3
+iris,classical-girvan-newman,0.3466666666666667,125,3

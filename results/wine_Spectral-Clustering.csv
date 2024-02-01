@@ -1,6 +1,6 @@
-,dataset,algorithm,purity,num_neighbors,num_clusters
-0,wine,Spectral-Clustering,0.7247191011235955,10,3
-0,wine,Spectral-Clustering,0.702247191011236,25,3
-0,wine,Spectral-Clustering,0.7415730337078652,50,3
-0,wine,Spectral-Clustering,0.7134831460674157,75,3
-0,wine,Spectral-Clustering,0.6292134831460674,100,3
+dataset,algorithm,mean_purity,num_neighbors,num_clusters,ci,
+wine,spectral-clustering,0.642134831,25,3,(0.5983946592303953, 0.6858750036909531)
+wine,spectral-clustering,0.642696629,50,3,(0.5913278477120599, 0.6940654107149064)
+wine,spectral-clustering,0.693820225,75,3,(0.6837507749218157, 0.7038896745163865)
+wine,spectral-clustering,0.625280899,100,3,(0.5946126769753808, 0.6559491207774282)
+wine,spectral-clustering,0.637640449,125,3,(0.5861652257256724, 0.689115673150732)
