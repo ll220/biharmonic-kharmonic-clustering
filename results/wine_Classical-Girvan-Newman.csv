@@ -1,0 +1,6 @@
+,dataset,algorithm,purity,num_neighbors,num_clusters
+0,wine,Classical-Girvan-Newman,0.7247191011235955,10,3
+0,wine,Classical-Girvan-Newman,0.7078651685393258,25,3
+0,wine,Classical-Girvan-Newman,0.7191011235955056,50,3
+0,wine,Classical-Girvan-Newman,0.6853932584269663,75,3
+0,wine,Classical-Girvan-Newman,0.6348314606741573,100,3

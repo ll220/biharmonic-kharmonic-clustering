@@ -1,0 +1,40 @@
+k: 0.1
+Mean purity: 0.4066666666666666
+k: 0.5
+Mean purity: 0.36
+k: 1
+Mean purity: 0.36
+k: 2
+Mean purity: 0.36666666666666664
+k: 3
+Mean purity: 0.3533333333333334
+k: 4
+Mean purity: 0.33999999999999997
+k: 5
+Mean purity: 0.4800000000000001
+k: 10
+Mean purity: 0.3466666666666667
+k: 11
+Mean purity: 0.3466666666666667
+k: 12
+Mean purity: 0.3466666666666667
+k: 13
+Mean purity: 0.3466666666666667
+k: 14
+Mean purity: 0.3466666666666667
+k: 15
+Mean purity: 0.3466666666666667
+k: 16
+Mean purity: 0.3466666666666667
+k: 17
+Mean purity: 0.3466666666666667
+k: 18
+Mean purity: 0.3466666666666667
+k: 19
+Mean purity: 0.3466666666666667
+k: 20
+Mean purity: 0.6333333333333332
+k: 50
+Mean purity: 0.6333333333333332
+k: 100
+Mean purity: 0.6333333333333332
