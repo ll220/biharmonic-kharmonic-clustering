@@ -74,7 +74,12 @@ def k_harmonics_of_edges(graph : nx.Graph, k : int, as_dict : bool=False) -> Tup
     return k_harmonic_of_edges
 
 def total_resistance(graph : nx) -> float:
-    """ Return the total resistance of a graph """
+    """ Return the total resistance of a connected graph.
+    
+    Caution: This method assumes the graph is connected.
+    For disconnected graphs, this function is incorrect.
+
+    """
     laplacian = nx.laplacian_matrix(graph).todense()
     pinv = np.linalg.pinv(laplacian, hermitian=True)
     return len(graph) * np.trace(pinv)
