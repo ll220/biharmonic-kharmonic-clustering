@@ -52,7 +52,7 @@ def k_harmonic_k_means_labels(
 
 if __name__=="__main__":
     from generate_graphs import load_iris_graph_and_labels
-    from meh import get_purity
+    from purity import get_purity
     
     num_clusters = 3
     harmonic_k = 5

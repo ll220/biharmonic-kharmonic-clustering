@@ -8,6 +8,15 @@ def get_labels_from_cluster(
     graph : nx.Graph, 
     clusters : List[Set]      
 ) -> np.array:
+    """ Convert a list of clusters into a list of labels 
+    
+    Args:
+        graph: NetworkX graph
+        clusters: A list of sets of nodes of `graph`
+    Returns:
+        A list of cluster labels for each node in the graph
+    
+    """
     labels = np.zeros(len(graph), dtype=int)
     for cluster_idx, cluster in enumerate(clusters):
         for node_idx in cluster:
@@ -56,7 +65,7 @@ def girvan_newman_agglomerative_matrix(
 
 if __name__=="__main__":
     from generate_graphs import load_iris_graph_and_labels
-    from meh import get_purity
+    from purity import get_purity
     import matplotlib.pyplot as plt
     from scipy.cluster.hierarchy import dendrogram
     

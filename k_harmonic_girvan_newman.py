@@ -2,29 +2,22 @@ from dendrogram_from_girvan_newman import sort_girvan_newman_partitions, agglome
 from functools import partial
 import networkx as nx
 import numpy as np
-import scipy
-from typing import List, Optional, Set, Tuple
+from typing import List, Optional, Set
 from k_harmonic_distance import max_k_harmonic_distance
-
-
-def create_community_node_colors(graph, communities):
-    """ Return a list of colors for a graph cluster structure """
-    number_of_colors = len(communities[0])
-    colors = ["#D4FCB1", "#CDC5FC", "#FFC2C4", "#F2D140", "#BCC6C8"][:number_of_colors]
-    node_colors = []
-    for node in graph:
-        current_community_index = 0
-        for community in communities:
-            if node in community:
-                node_colors.append(colors[current_community_index])
-                break
-            current_community_index += 1
-    return node_colors
 
 def get_labels_from_cluster(
     graph : nx.Graph, 
     clusters : List[Set]      
 ) -> np.array:
+    """ Convert a list of clusters into a list of labels 
+    
+    Args:
+        graph: NetworkX graph
+        clusters: A list of sets of nodes of `graph`
+    Returns:
+        A list of cluster labels for each node in the graph
+    
+    """
     labels = np.zeros(len(graph), dtype=int)
     for cluster_idx, cluster in enumerate(clusters):
         for node_idx in cluster:
@@ -39,9 +32,11 @@ def k_harmonic_girvan_newman_labels(
     """ Generate the cluster labels of a graph using the k-harmonic Girvan-Newman algorithm """
     partial_max_k_harmonic_distance = partial(max_k_harmonic_distance, k=k)
     cluster_iter = nx.community.girvan_newman(graph, partial_max_k_harmonic_distance)
-    for _ in range(num_clusters-1):
-        clusters : List[Set] = next(cluster_iter)
-    labels = get_labels_from_cluster(graph, clusters)
+    for _ in range(num_clusters-1): 
+        # Each iteration of Girvan-Newman removes edges until creates a new connected component. 
+        # Loop until the graph has `num_clusters` connected components.
+        clusters : List[Set] = next(cluster_iter) 
+    labels : np.array = get_labels_from_cluster(graph, clusters)
     return labels
 
 def k_harmonic_girvan_newman_best_labels(
@@ -49,7 +44,7 @@ def k_harmonic_girvan_newman_best_labels(
     k : int,
     num_clusters : Optional[int] = None
 ) -> np.array:
-    """ Generate the cluster labels of a graph using the k-harmonic Girvan-Newman algorithm """
+    # TODO: documentation
     partial_max_k_harmonic_distance = partial(max_k_harmonic_distance, k=k)
     if num_clusters is None:
         clusters = list(nx.community.girvan_newman(graph, partial_max_k_harmonic_distance))
@@ -77,7 +72,7 @@ def k_harmonic_girvan_newman_agglomerative_matrix(
 
 if __name__=="__main__":
     from generate_graphs import load_iris_graph_and_labels
-    from meh import get_purity
+    from purity import get_purity
     import matplotlib.pyplot as plt
     from scipy.cluster.hierarchy import dendrogram
     
