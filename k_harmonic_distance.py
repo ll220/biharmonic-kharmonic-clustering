@@ -30,24 +30,11 @@ def max_k_harmonic_distance(graph : nx.Graph, k : int) -> Tuple[int,int]:
 
 def max_biharmonic_distance(graph : nx.Graph) -> Tuple[int,int]:
     """ Return the edge with the highest biharmonic distance """
-    laplacian = nx.laplacian_matrix(graph).todense()
-    pinv = np.linalg.pinv(laplacian, hermitian=True)
-    pinv_squared = pinv @ pinv
-    biharmonic_distance = lambda s, t : pinv_squared[s,s] + pinv_squared[t,t] - 2*pinv_squared[s,t]
-    edges = list(graph.edges)
-    biharmonics_of_edges = [biharmonic_distance(u,v) for u,v in edges]
-    max_edge_idx = np.argmax(biharmonics_of_edges)
-    return edges[max_edge_idx]
+    return max_k_harmonic_distance(graph, k=2)
 
 def max_effective_resistance(graph : nx.Graph) -> Tuple[int,int]:
     """ Return the edge with the highest effective resistance """
-    laplacian = nx.laplacian_matrix(graph).todense()
-    pinv = np.linalg.pinv(laplacian, hermitian=True)
-    effective_resistance = lambda s, t : pinv[s,s] + pinv[t,t] - 2*pinv[s,t]
-    edges = list(graph.edges)
-    resistances_of_edges = [effective_resistance(u,v) for u,v in edges]
-    max_edge_idx = np.argmax(resistances_of_edges)
-    return edges[max_edge_idx]
+    return max_k_harmonic_distance(graph, k=1)
 
 def biharmonics_of_edges(graph : nx.Graph, as_dict : bool=False):
     """ Return the biharmonic distance of all edges in the graph 
