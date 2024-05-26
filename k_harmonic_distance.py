@@ -36,32 +36,14 @@ def max_effective_resistance(graph : nx.Graph) -> Tuple[int,int]:
     """ Return the edge with the highest effective resistance """
     return max_k_harmonic_distance(graph, k=1)
 
-def biharmonics_of_edges(graph : nx.Graph, as_dict : bool=False):
-    """ Return the biharmonic distance of all edges in the graph 
-    
-    Args:
-        graph: NetworkX graph
-        as_dict: If True, return the biharmonic distances as a dict of the form { (int, int) : float}.
-            If False, return the biharmonic distances as a list (in the same order as graph.edges)
-    """
-    laplacian = nx.laplacian_matrix(graph).todense()
-    pinv = np.linalg.pinv(laplacian, hermitian=True)
-    pinv_squared = pinv @ pinv
-    biharmonic_distance = lambda s, t : pinv_squared[s,s] + pinv_squared[t,t] - 2*pinv_squared[s,t]
-    if as_dict:
-        biharmonics_of_edges = { (u,v) : biharmonic_distance(u,v) for u,v in graph.edges }
-    else:
-        biharmonics_of_edges = [ biharmonic_distance(u,v) for u,v in graph.edges ]
-    return biharmonics_of_edges
-
 def k_harmonics_of_edges(graph : nx.Graph, k : int, as_dict : bool=False) -> Tuple[int,int]:
-    """ Return the k-harmonic distance of all edges in the graph 
+    """ Return the squared k-harmonic distance of all edges in the graph 
     
     Args:
         graph: NetworkX graph
         k: power of the k-harmonic distance
-        as_dict: If True, return the biharmonic distances as a dict of the form { (int, int) : float}.
-            If False, return the biharmonic distances as a list (in the same order as graph.edges)
+        as_dict: If True, return the k-harmonic distances as a dict of the form { (int, int) : float}.
+            If False, return the k-harmonic distances as a list (in the same order as graph.edges)
     """
     laplacian = nx.laplacian_matrix(graph).todense()
     pinv = np.linalg.pinv(laplacian, hermitian=True)
@@ -72,6 +54,26 @@ def k_harmonics_of_edges(graph : nx.Graph, k : int, as_dict : bool=False) -> Tup
     else:
         k_harmonic_of_edges = [k_harmonic_distance(u,v) for u,v in graph.edges]
     return k_harmonic_of_edges
+
+def biharmonics_of_edges(graph : nx.Graph, as_dict : bool=False):
+    """ Return the squared biharmonic distance of all edges in the graph 
+    
+    Args:
+        graph: NetworkX graph
+        as_dict: If True, return the biharmonic distances as a dict of the form { (int, int) : float}.
+            If False, return the biharmonic distances as a list (in the same order as graph.edges)
+    """
+    return k_harmonics_of_edges(graph, k=2, as_dict=as_dict)
+
+def effective_resistance_of_edges(graph : nx.Graph, as_dict : bool=False):
+    """ Return the effective resistance of all edges in the graph 
+    
+    Args:
+        graph: NetworkX graph
+        as_dict: If True, return the effective resistances as a dict of the form { (int, int) : float}.
+            If False, return the effective resistances as a list (in the same order as graph.edges)
+    """
+    return k_harmonics_of_edges(graph, k=1, as_dict=as_dict)
 
 def total_resistance(graph : nx) -> float:
     """ Return the total resistance of a connected graph.
