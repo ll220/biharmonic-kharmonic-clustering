@@ -34,7 +34,7 @@ def run_spectral_clustering(
     graph : nx.Graph,
     num_clusters : int
 ):
-    """ Run the spectral clustering algorithm on a networkx graph """
+    """ Run the spectral clustering algorithm on a NetworkX graph """
     laplacian = nx.laplacian_matrix(graph).toarray()
     _, eigenvectors = np.linalg.eigh(laplacian)
     first_k_eigenvectors = eigenvectors[:, 1:num_clusters+1]

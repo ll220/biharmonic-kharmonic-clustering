@@ -6,7 +6,7 @@ from sklearn.cluster import KMeans
 def get_k_harmonic_position_encoding(
     G : nx.Graph,
     k : int
-) -> np.array:
+) -> np.ndarray:
     """ Compute the k-harmonic positional encodings of a graph G 
     
     The k-harmonic position encoding are points p_v such that 
@@ -44,7 +44,7 @@ def k_harmonic_k_means_labels(
     G : nx.Graph,
     k : int,
     num_clusters : int
-) -> np.array:
+) -> np.ndarray:
     """ Compute the k-harmonic k-means clustering of a graph G """
     position_encoding = get_k_harmonic_position_encoding(G, k)
     kmeans = KMeans(n_clusters=num_clusters, random_state=0, n_init="auto").fit(position_encoding)

@@ -3,7 +3,7 @@ import numpy as np
 from scipy.linalg import fractional_matrix_power
 from typing import Dict, List, Tuple
 
-def component_mask(graph : nx.Graph) -> np.array:
+def component_mask(graph : nx.Graph) -> np.ndarray:
     """ Return the component mask of a graph
 
     The component mask of a graph is a matrix C
