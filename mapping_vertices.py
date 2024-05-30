@@ -11,10 +11,18 @@ from sklearn.metrics import adjusted_rand_score
 import sys
 from typing import Optional
 import os
-
+from girvan_newman import girvan_newman_labels
 from k_harmonic_k_means import get_k_harmonic_position_encoding, k_harmonic_k_means, k_harmonic_k_means_labels
 from k_harmonic_girvan_newman import k_harmonic_girvan_newman_labels, k_harmonic_girvan_newman_best_labels
-from generate_graphs import load_iris_graph_and_labels
+from generate_graphs import (
+    load_iris_graph_and_labels, 
+    load_cancer_graph_and_labels, 
+    load_wine_graph_and_labels,
+    load_block_stochastic_graph_and_labels
+)
+from spectral_clustering import run_spectral_clustering
+
+# TODO: Clean up
 
 
 # CANNOT BE CHANGED WITHOUT CHANGING CODE
@@ -360,6 +368,37 @@ def k_hyperparameter_analysis(
 
 
 
+def analysis(
+    graph_and_label_func,
+    graph_func_kwargs,
+    clustering_algorithm,
+    clustering_func_kwargs,
+    dataset_name : Optional[str] = None,
+    clustering_alg_name : Optional[str] = None
+):
+    """ Use `clustering_algorithm` to cluster the graph given by `graph_and_label_func` for various k """
+    if dataset_name is None:
+        dataset_name = graph_and_label_func.__name__
+    if clustering_alg_name is None:
+        clustering_alg_name = clustering_algorithm.__name__
+
+    graph, true_labels = graph_and_label_func(**graph_func_kwargs)
+
+    results = []
+    
+    pred_labels = clustering_algorithm(graph, **clustering_func_kwargs)
+    purity = get_purity(pred_labels, true_labels)
+    results.append({
+        "dataset" : dataset_name,
+        "algorithm" : clustering_alg_name,
+        "purity" : purity
+    } | graph_func_kwargs | clustering_func_kwargs)
+    
+    results_df = pd.DataFrame(results)
+    with open(f"results/{dataset_name}_{clustering_alg_name}.csv", "a") as f:
+        file_exists = f.tell()
+        results_df.to_csv(f, mode="a", header=(not file_exists))
+
 def main():   
     # input_directory = sys.argv[1]
     # output_directory = sys.argv[2]
@@ -368,19 +407,47 @@ def main():
 
     # for input_file in input_files:
     #     analysis(os.path.join(input_directory, input_file), output_directory)
-    for num_neighbors in [25, 50, 75, 100]:
+    """
+    for num_neighbors in [10, 25, 50, 75, 100]:
         graph_func_kwargs = {"num_neighbors" : num_neighbors}
-        clustering_func_kwargs = {"num_clusters" : 10}
-        funcs = [k_harmonic_k_means_labels, k_harmonic_girvan_newman_labels]
-        func_names = ["k-Means", "Girvan-Newman"]
+        funcs = [run_spectral_clustering]
+        func_names = ["Spectral-Clustering"]
+        datasets = [load_block_stochastic_graph_and_labels]
+        dataset_names = ["block_stochastic_graph"]
         for func, func_name in zip(funcs, func_names):
-            print(f"{func_name} {num_neighbors}")
-            k_hyperparameter_analysis(
-                load_iris_graph_and_labels,
+            for dataset, dataset_name, num_clusters in zip(datasets, dataset_names, [3, 3, 2]):
+                print(f"{dataset_name} {func_name} {num_neighbors}")
+                clustering_func_kwargs = {"num_clusters" : num_clusters}
+                analysis(
+                    dataset,
+                    graph_func_kwargs,
+                    func,
+                    clustering_func_kwargs,
+                    dataset_name=dataset_name,
+                    clustering_alg_name=func_name
+                )
+    """
+    
+    funcs = [run_spectral_clustering]
+    func_names = ["Spectral-Clustering"]
+    datasets = [load_block_stochastic_graph_and_labels]
+    dataset_names = ["block_stochastic_graph"]
+    graph_func_kwargs = {
+        "num_nodes_per_cluster" : 25, 
+        "num_clusters" : 6,
+        "intercluster_p" : 0.25,
+        "intracluster_p" : 0.75
+    }
+    clustering_func_kwargs = {"num_clusters" : 6}
+    for func, func_name in zip(funcs, func_names):
+        for dataset, dataset_name in zip(datasets, dataset_names):
+            print(f"{dataset_name} {func_name}")
+            analysis(
+                dataset,
                 graph_func_kwargs,
                 func,
                 clustering_func_kwargs,
-                dataset_name="iris",
+                dataset_name=dataset_name,
                 clustering_alg_name=func_name
             )
 

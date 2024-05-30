@@ -2,38 +2,40 @@ import networkx as nx
 import numpy as np
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
-from sklearn.cluster import SpectralClustering
+from typing import Optional
 
-# scaled by 1/eigenvalue takes projection to first three and scales on each eigenvector proportional to eigenvalue 
-# how to argue against someone saying spectral clustering is around and does the same
-# the big thing is that our embedding is independent of k number of clusters
-def run_combined_k_harmonic_spectral_clustering(graph, k_harmonic):
-    laplacian = nx.laplacian_matrix(graph)
-    laplacian = laplacian.toarray()
-
+def run_low_rank_k_harmonic_clustering(
+    graph, 
+    k_harmonic : int,   
+    num_clusters : int,
+    rank : Optional[int] = None
+):
+    """ Run the low-rank k-harmonic spectral clustering algorithm on `graph`
+    
+    Args:
+        graph: NetworkX graph
+        k_harmonic: Power of the k-harmonic distance
+        num_clusters: Number of clusters
+        rank: rank for the low-rank k-harmonic distance
+            If None, set rank = num_clusters
+    """
+    if rank is None:
+        rank = num_clusters
+    laplacian = nx.laplacian_matrix(graph).toarray()
     eigenvalues, eigenvectors = np.linalg.eigh(laplacian)
-    first_k_eigenvectors = eigenvectors[:, 1:4]
-
-    first_k_eigenvectors = first_k_eigenvectors.T
-
-    for i in range(3):
-        first_k_eigenvectors[i] = (1 / pow(eigenvalues[i + 1], k_harmonic)) * first_k_eigenvectors[i]
-
-    first_k_eigenvectors = first_k_eigenvectors.T
-    # first_k_eigenvectors = eigenvectors
-    # first_k_eigenvectors = first_k_eigenvectors.T
-    # print(first_k_eigenvectors)
-
-    kmeans = KMeans(n_clusters=3, random_state=0, n_init="auto").fit(first_k_eigenvectors)
-
+    first_k_eigenvalues = eigenvalues[1:rank+1]
+    first_k_eigenvectors = eigenvectors[:,1:rank+1]
+    scaled_eigenvectors = \
+        np.float_power(first_k_eigenvalues, -(k_harmonic/2)).reshape(1, rank) * first_k_eigenvectors
+    kmeans = KMeans(n_clusters=num_clusters, random_state=0, n_init="auto").fit(scaled_eigenvectors)
     return kmeans.labels_
 
 def run_spectral_clustering(
     graph : nx.Graph,
     num_clusters : int
 ):
-    laplacian = nx.laplacian_matrix(graph)
-    laplacian = laplacian.toarray()
+    """ Run the spectral clustering algorithm on a NetworkX graph """
+    laplacian = nx.laplacian_matrix(graph).toarray()
     _, eigenvectors = np.linalg.eigh(laplacian)
     first_k_eigenvectors = eigenvectors[:, 1:num_clusters+1]
     kmeans = KMeans(n_clusters=num_clusters, random_state=0, n_init="auto").fit(first_k_eigenvectors)
@@ -53,7 +55,7 @@ if __name__=="__main__":
     #     for k_harmonic in K_HARMONICS:
     #         accuracies = []
     #         for _ in range(10):
-    #             results = run_combined_k_harmonic_spectral_clustering(G, k_harmonic)
+    #             results = run_low_rank_k_harmonic_clustering(G, k_harmonic, num_cluster=3)
     #             purity = get_purity(results, true_clusters)
     #             accuracies.append(purity)
 
@@ -89,61 +91,5 @@ if __name__=="__main__":
         mean_accuracy = np.mean(accuracies)
         f.write(str(k_neighbors) + ":" + str(mean_accuracy) + "\n")
 
-
-
-
-
-
-
-
-
-
-
-
-
-# accuracies = []
-
-# A = nx.adjacency_matrix(G)
-
-# spectral_model_nn = SpectralClustering(n_clusters = 3, affinity ='nearest_neighbors')
-# labels_nn = spectral_model_nn.fit_predict(A)
-
-# print(get_purity(labels_nn, true_clusters))
-
-# colors = ['red', 'blue', 'green']
-# node_colors = [colors[cluster] for cluster in labels_nn]
-
-# nx.draw(G, with_labels=True, node_color=node_colors)
-# plt.title('Clustered Graph')        
-# # plt.savefig("spectral clustering_" + str(k))
-# plt.show()    
-# plt.clf()
-
-# f = open("spectral_clustering_purities.txt", "w")
-# for k in [25, 50, 75, 100, 125]:
-#     G, true_clusters = load_iris_graph_and_labels(num_neighbors=k)
-#     # run_spectral_clustering_experiments(G, true_clusters)
-#     accuracies = []
-
-#     A = nx.adjacency_matrix(G)
-#     for i in range(10):
-#         spectral_model_nn = SpectralClustering(n_clusters = 3, affinity ='precomputed')
-#         labels_nn = spectral_model_nn.fit_predict(A)
-
-#         purity = get_purity(labels_nn, true_clusters)
-#         accuracies.append(purity)
-
-        
-#         colors = ['red', 'blue', 'green']
-#         node_colors = [colors[cluster] for cluster in labels_nn]
-
-#         nx.draw(G, with_labels=True, node_color=node_colors)
-#         plt.title('Clustered Graph')        
-#         plt.savefig("spectral clustering_" + str(k))
-#         # plt.show()    
-#         plt.clf()
-
-#     mean_accuracy = np.mean(accuracies)
-#     f.write(str(k) + ":" + str(mean_accuracy) + "\n")
 
 
