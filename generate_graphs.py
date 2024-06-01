@@ -1,10 +1,11 @@
 import numpy as np
+import numpy.typing as npt
 import networkx as nx
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_iris, load_wine, load_breast_cancer
 from sklearn.neighbors import kneighbors_graph
 
-def load_iris_graph_and_labels(num_neighbors : int) -> tuple[nx.Graph, np.ndarray[int]]:
+def load_iris_graph_and_labels(num_neighbors : int) -> tuple[nx.Graph, npt.NDArray[np.int]]:
     """ Return the nearest neighbor graph and cluster labels of the Iris dataset 
     
     Args:
@@ -22,7 +23,7 @@ def load_iris_graph_and_labels(num_neighbors : int) -> tuple[nx.Graph, np.ndarra
     graph = nx.from_numpy_array(adjacency_matrix)
     return graph, labels
 
-def load_wine_graph_and_labels(num_neighbors : int) -> tuple[nx.Graph, np.ndarray[int]]:
+def load_wine_graph_and_labels(num_neighbors : int) -> tuple[nx.Graph, npt.NDArray[np.int]]:
     """ Return the nearest neighbor graph and cluster labels of the Wine dataset 
     
     Args:
@@ -40,7 +41,7 @@ def load_wine_graph_and_labels(num_neighbors : int) -> tuple[nx.Graph, np.ndarra
     graph = nx.from_numpy_array(adjacency_matrix)
     return graph, labels
 
-def load_cancer_graph_and_labels(num_neighbors : int) -> tuple[nx.Graph, np.ndarray[int]]:
+def load_cancer_graph_and_labels(num_neighbors : int) -> tuple[nx.Graph, npt.NDArray[np.int]]:
     """ Return the nearest neighbor graph and cluster labels of the Breast Cancer dataset 
     
     Args:
@@ -61,7 +62,7 @@ def load_cancer_graph_and_labels(num_neighbors : int) -> tuple[nx.Graph, np.ndar
 def load_uci_graph_and_labels(
     num_neighbors : int, 
     id : int
-) -> tuple[nx.Graph, np.ndarray[int]]:
+) -> tuple[nx.Graph, npt.NDArray[np.int]]:
     """ Return the nearest neighbor graph and cluster labels of a dataset from the UCI repository
     
     Args:
@@ -87,7 +88,7 @@ def load_block_stochastic_graph_and_labels(
     num_clusters : int,
     intercluster_p : float,
     intracluster_p : float
-) -> tuple[nx.Graph, np.ndarray[int]]:
+) -> tuple[nx.Graph, npt.NDArray[np.int]]:
     """ Return a block stochatsic graph
     
     args:
