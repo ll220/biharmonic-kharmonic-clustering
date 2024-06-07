@@ -9,9 +9,9 @@ def k_harmonic_betweenness_centrality(
 ) -> List[float]:
     """ Return the k-harmonic betweenness of each node in the graph 
     
-    For a node v, the k-harmonic between of v is 
+    For a node v, the k-harmonic betweenness of v is 
     $$
-        B^{k}_{v} = \sum_{u\in N(v)} B^{2}_{uv}
+        B^{(k)}_{v} = \sum_{u\in N(v)} (H^{(k})})^{2}_{uv}
     $$
     where $N(v)$ is the set of neighbors of v. 
 
@@ -37,7 +37,7 @@ def k_harmonic_closeness_centrality(
     
     For a node v, the k-harmonic between of v is 
     $$
-        C^{k}_{v} = (\sum_{u\in V} B^{2}_{uv})^{-1}.
+        C^{k}_{v} = (\sum_{u\in V} (H^{(k})})^{2}_{uv})^{-1}.
     $$ 
     
     """
