@@ -75,7 +75,7 @@ def effective_resistance_of_edges(graph : nx.Graph, as_dict : bool=False):
     """
     return k_harmonics_of_edges(graph, k=1, as_dict=as_dict)
 
-def total_resistance(graph : nx) -> float:
+def total_resistance(graph : nx.Graph) -> float:
     """ Return the total resistance of a connected graph.
     
     Caution: This method assumes the graph is connected.
