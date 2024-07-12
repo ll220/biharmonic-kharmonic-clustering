@@ -35,7 +35,9 @@ def plot_k_harmonic(
         pos = nx.spring_layout(graph)
     if colorbar_label is None:
         colorbar_label = f"Squared {k}-Harmonic Distance"
+    
     edge_colors = np.round(k_harmonics_of_edges(graph, k), 6)
+    # set min and max values for the colorbar
     if "edge_vmin" in kwargs:
         edge_vmin = kwargs["edge_vmin"]
         del kwargs["edge_vmin"]
