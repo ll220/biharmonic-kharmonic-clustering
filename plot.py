@@ -48,8 +48,8 @@ def plot_k_harmonic(
         del kwargs["edge_vmax"]
     else:
         edge_vmax = np.max(edge_colors)
-    # handle edge case of all edges having the same color
     if edge_vmin ==  edge_vmax:
+        # handle edge case of all edges having the same color
         edge_vmin = edge_vmin - 0.1
         edge_vmax = edge_vmax + 0.1
     # plot the graph
